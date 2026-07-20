@@ -69,7 +69,7 @@ void ms_deformable_col2im_cuda(
     if ((channels & THREADS_PER_BLOCK - 1) == 0) {
       ms_deformable_col2im_gpu_kernel_shm_reduce_v2_multi_blocks<scalar_t>
           <<<GET_BLOCKS(num_actual_kernels, num_threads), num_threads,
-             num_threads * 3 * sizeof(scalar_t), stream>>>(
+             num_threads * 4 * sizeof(scalar_t), stream>>>(
               num_kernels, grad_col, data_value, data_spatial_shapes,
               data_level_start_index, data_sampling_loc, data_attn_weight,
               batch_size, spatial_size, num_heads, channels, num_levels,
@@ -190,7 +190,7 @@ void ms_deformable_col2im_cuda(
         if (channels < 64) {
           ms_deformable_col2im_gpu_kernel_shm_reduce_v1<scalar_t>
               <<<GET_BLOCKS(num_actual_kernels, num_threads), num_threads,
-                 num_threads * 3 * sizeof(scalar_t), stream>>>(
+                 num_threads * 4 * sizeof(scalar_t), stream>>>(
                   num_kernels, grad_col, data_value, data_spatial_shapes,
                   data_level_start_index, data_sampling_loc, data_attn_weight,
                   batch_size, spatial_size, num_heads, channels, num_levels,
@@ -199,7 +199,7 @@ void ms_deformable_col2im_cuda(
         } else {
           ms_deformable_col2im_gpu_kernel_shm_reduce_v2<scalar_t>
               <<<GET_BLOCKS(num_actual_kernels, num_threads), num_threads,
-                 num_threads * 3 * sizeof(scalar_t), stream>>>(
+                 num_threads * 4 * sizeof(scalar_t), stream>>>(
                   num_kernels, grad_col, data_value, data_spatial_shapes,
                   data_level_start_index, data_sampling_loc, data_attn_weight,
                   batch_size, spatial_size, num_heads, channels, num_levels,
