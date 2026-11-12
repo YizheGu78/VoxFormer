@@ -1,5 +1,7 @@
 from setuptools import setup
 import os, glob
+import hashlib
+from pathlib import Path
 
 # RadarOcc compatibility note:
 # The official RadarOcc stack uses PyTorch 1.10.1 + CUDA 11.3. This old
@@ -28,8 +30,14 @@ def get_extensions():
     os.environ.setdefault('MAX_JOBS', str(cpu_use))
 
     define_macros = []
+    kernel = Path(__file__).resolve().parent/'csrc/ms_deform_attn_cuda_kernel.cuh'
+    # Let the audit reject a stale .so after the CUDA source has been repaired.
+    define_macros.append(('RADAROCC_KERNEL_SOURCE_SHA256',
+                          '"'+hashlib.sha256(kernel.read_bytes()).hexdigest()+'"'))
 
-    if torch.cuda.is_available():
+    # A CUDA toolkit can rebuild kernels even when the driver/device is absent.
+    # if torch.cuda.is_available():
+    if torch.cuda.is_available() or os.environ.get('FORCE_CUDA') == '1':
         print(f'Compiling {ext_name} with CUDA')
         print(f'TORCH_CUDA_ARCH_LIST={os.environ.get("TORCH_CUDA_ARCH_LIST")}')
         define_macros += [('WITH_CUDA', None)]

@@ -365,7 +365,13 @@ void ms_deform_attn_cuda_backward(
 }
 
 
+#ifndef RADAROCC_KERNEL_SOURCE_SHA256
+#define RADAROCC_KERNEL_SOURCE_SHA256 "unversioned"
+#endif
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.attr("trilinear_gradient_version") = "trilinear_grad_v2";
+  m.attr("kernel_source_sha256") = RADAROCC_KERNEL_SOURCE_SHA256;
   m.def("ms_deform_attn_forward", &ms_deform_attn_cuda_forward,
         "forward function of multi-scale deformable attention",
         py::arg("value"), py::arg("value_spatial_shapes"),

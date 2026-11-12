@@ -129,72 +129,96 @@ __device__ void ms_deform_attn_col2im_bilinear(
   if (h_low >= 0 && w_low >= 0 && z_low >= 0) {
     const int ptr1 = h_low_ptr_offset + w_low_ptr_offset + z_low_ptr_offset + base_ptr;
     v1 = bottom_data[ptr1];
-    grad_h_weight -= hw * v1;
-    grad_w_weight -= hh * v1;
-    grad_z_weight -= hz * v1;
+    // Before trilinear-gradient fix: grad_h_weight -= hw * v1;
+    grad_h_weight -= hw * hz * v1;
+    // Before trilinear-gradient fix: grad_w_weight -= hh * v1;
+    grad_w_weight -= hh * hz * v1;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v1;
+    grad_z_weight -= hh * hw * v1;
     atomicAdd(grad_value + ptr1, w1 * top_grad_value);
   }
   scalar_t v2 = 0;
   if (h_low >= 0 && w_high <= width - 1 && z_low >= 0) {
     const int ptr2 = h_low_ptr_offset + w_high_ptr_offset + z_low_ptr_offset + base_ptr;
     v2 = bottom_data[ptr2];
-    grad_h_weight -= lw * v2;
-    grad_w_weight += hh * v2;
-    grad_z_weight -= hz * v2;
+    // Before trilinear-gradient fix: grad_h_weight -= lw * v2;
+    grad_h_weight -= lw * hz * v2;
+    // Before trilinear-gradient fix: grad_w_weight += hh * v2;
+    grad_w_weight += hh * hz * v2;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v2;
+    grad_z_weight -= hh * lw * v2;
     atomicAdd(grad_value + ptr2, w2 * top_grad_value);
   }
   scalar_t v3 = 0;
   if (h_high <= height - 1 && w_low >= 0 && z_low >= 0) {
     const int ptr3 = h_high_ptr_offset + w_low_ptr_offset + z_low_ptr_offset + base_ptr;
     v3 = bottom_data[ptr3];
-    grad_h_weight += hw * v3;
-    grad_w_weight -= lh * v3;
-    grad_z_weight -= hz * v3;
+    // Before trilinear-gradient fix: grad_h_weight += hw * v3;
+    grad_h_weight += hw * hz * v3;
+    // Before trilinear-gradient fix: grad_w_weight -= lh * v3;
+    grad_w_weight -= lh * hz * v3;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v3;
+    grad_z_weight -= lh * hw * v3;
     atomicAdd(grad_value + ptr3, w3 * top_grad_value);
   }
   scalar_t v4 = 0;
   if (h_high <= height - 1 && w_high <= width - 1 && z_low >= 0) {
     const int ptr4 = h_high_ptr_offset + w_high_ptr_offset + z_low_ptr_offset + base_ptr;
     v4 = bottom_data[ptr4];
-    grad_h_weight += lw * v4;
-    grad_w_weight += lh * v4;
-    grad_z_weight -= hz * v4;
+    // Before trilinear-gradient fix: grad_h_weight += lw * v4;
+    grad_h_weight += lw * hz * v4;
+    // Before trilinear-gradient fix: grad_w_weight += lh * v4;
+    grad_w_weight += lh * hz * v4;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v4;
+    grad_z_weight -= lh * lw * v4;
     atomicAdd(grad_value + ptr4, w4 * top_grad_value);
   }
   scalar_t v5 = 0;
   if (h_low >= 0 && w_low >= 0 && z_high <= depth - 1) {
     const int ptr5 = h_low_ptr_offset + w_low_ptr_offset + z_high_ptr_offset + base_ptr;
     v5 = bottom_data[ptr5];
-    grad_h_weight -= hw * v5;
-    grad_w_weight -= hh * v5;
-    grad_z_weight += lz * v5;
+    // Before trilinear-gradient fix: grad_h_weight -= hw * v5;
+    grad_h_weight -= hw * lz * v5;
+    // Before trilinear-gradient fix: grad_w_weight -= hh * v5;
+    grad_w_weight -= hh * lz * v5;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v5;
+    grad_z_weight += hh * hw * v5;
     atomicAdd(grad_value + ptr5, w5 * top_grad_value);
   }
   scalar_t v6 = 0;
   if (h_low >= 0 && w_high <= width - 1 && z_high <= depth - 1) {
     const int ptr6 = h_low_ptr_offset + w_high_ptr_offset + z_high_ptr_offset + base_ptr;
     v6 = bottom_data[ptr6];
-    grad_h_weight -= lw * v6;
-    grad_w_weight += hh * v6;
-    grad_z_weight += lz * v6;
+    // Before trilinear-gradient fix: grad_h_weight -= lw * v6;
+    grad_h_weight -= lw * lz * v6;
+    // Before trilinear-gradient fix: grad_w_weight += hh * v6;
+    grad_w_weight += hh * lz * v6;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v6;
+    grad_z_weight += hh * lw * v6;
     atomicAdd(grad_value + ptr6, w6 * top_grad_value);
   }
   scalar_t v7 = 0;
   if (h_high <= height - 1 && w_low >= 0 && z_high <= depth - 1) {
     const int ptr7 = h_high_ptr_offset + w_low_ptr_offset + z_high_ptr_offset + base_ptr;
     v7 = bottom_data[ptr7];
-    grad_h_weight += hw * v7;
-    grad_w_weight -= lh * v7;
-    grad_z_weight += lz * v7;
+    // Before trilinear-gradient fix: grad_h_weight += hw * v7;
+    grad_h_weight += hw * lz * v7;
+    // Before trilinear-gradient fix: grad_w_weight -= lh * v7;
+    grad_w_weight -= lh * lz * v7;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v7;
+    grad_z_weight += lh * hw * v7;
     atomicAdd(grad_value + ptr7, w7 * top_grad_value);
   }
   scalar_t v8 = 0;
   if (h_high <= height - 1 && w_high <= width - 1 && z_high <= depth - 1) {
     const int ptr8 = h_high_ptr_offset + w_high_ptr_offset + z_high_ptr_offset + base_ptr;
     v8 = bottom_data[ptr8];
-    grad_h_weight += lw * v8;
-    grad_w_weight += lh * v8;
-    grad_z_weight += lz * v8;
+    // Before trilinear-gradient fix: grad_h_weight += lw * v8;
+    grad_h_weight += lw * lz * v8;
+    // Before trilinear-gradient fix: grad_w_weight += lh * v8;
+    grad_w_weight += lh * lz * v8;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v8;
+    grad_z_weight += lh * lw * v8;
     atomicAdd(grad_value + ptr8, w8 * top_grad_value);
   }
 
@@ -244,72 +268,96 @@ __device__ void ms_deform_attn_col2im_bilinear_gm(
   if (h_low >= 0 && w_low >= 0 && z_low >= 0) {
     const int ptr1 = h_low_ptr_offset + w_low_ptr_offset + z_low_ptr_offset + base_ptr;
     v1 = bottom_data[ptr1];
-    grad_h_weight -= hw * v1;
-    grad_w_weight -= hh * v1;
-    grad_z_weight -= hz * v1;
+    // Before trilinear-gradient fix: grad_h_weight -= hw * v1;
+    grad_h_weight -= hw * hz * v1;
+    // Before trilinear-gradient fix: grad_w_weight -= hh * v1;
+    grad_w_weight -= hh * hz * v1;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v1;
+    grad_z_weight -= hh * hw * v1;
     atomicAdd(grad_value + ptr1, w1 * top_grad_value);
   }
   scalar_t v2 = 0;
   if (h_low >= 0 && w_high <= width - 1 && z_low >= 0) {
     const int ptr2 = h_low_ptr_offset + w_high_ptr_offset + z_low_ptr_offset + base_ptr;
     v2 = bottom_data[ptr2];
-    grad_h_weight -= lw * v2;
-    grad_w_weight += hh * v2;
-    grad_z_weight -= hz * v2;
+    // Before trilinear-gradient fix: grad_h_weight -= lw * v2;
+    grad_h_weight -= lw * hz * v2;
+    // Before trilinear-gradient fix: grad_w_weight += hh * v2;
+    grad_w_weight += hh * hz * v2;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v2;
+    grad_z_weight -= hh * lw * v2;
     atomicAdd(grad_value + ptr2, w2 * top_grad_value);
   }
   scalar_t v3 = 0;
   if (h_high <= height - 1 && w_low >= 0 && z_low >= 0) {
     const int ptr3 = h_high_ptr_offset + w_low_ptr_offset + z_low_ptr_offset + base_ptr;
     v3 = bottom_data[ptr3];
-    grad_h_weight += hw * v3;
-    grad_w_weight -= lh * v3;
-    grad_z_weight -= hz * v3;
+    // Before trilinear-gradient fix: grad_h_weight += hw * v3;
+    grad_h_weight += hw * hz * v3;
+    // Before trilinear-gradient fix: grad_w_weight -= lh * v3;
+    grad_w_weight -= lh * hz * v3;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v3;
+    grad_z_weight -= lh * hw * v3;
     atomicAdd(grad_value + ptr3, w3 * top_grad_value);
   }
   scalar_t v4 = 0;
   if (h_high <= height - 1 && w_high <= width - 1 && z_low >= 0) {
     const int ptr4 = h_high_ptr_offset + w_high_ptr_offset + z_low_ptr_offset + base_ptr;
     v4 = bottom_data[ptr4];
-    grad_h_weight += lw * v4;
-    grad_w_weight += lh * v4;
-    grad_z_weight -= hz * v4;
+    // Before trilinear-gradient fix: grad_h_weight += lw * v4;
+    grad_h_weight += lw * hz * v4;
+    // Before trilinear-gradient fix: grad_w_weight += lh * v4;
+    grad_w_weight += lh * hz * v4;
+    // Before trilinear-gradient fix: grad_z_weight -= hz * v4;
+    grad_z_weight -= lh * lw * v4;
     atomicAdd(grad_value + ptr4, w4 * top_grad_value);
   }
   scalar_t v5 = 0;
   if (h_low >= 0 && w_low >= 0 && z_high <= depth - 1) {
     const int ptr5 = h_low_ptr_offset + w_low_ptr_offset + z_high_ptr_offset + base_ptr;
     v5 = bottom_data[ptr5];
-    grad_h_weight -= hw * v5;
-    grad_w_weight -= hh * v5;
-    grad_z_weight += lz * v5;
+    // Before trilinear-gradient fix: grad_h_weight -= hw * v5;
+    grad_h_weight -= hw * lz * v5;
+    // Before trilinear-gradient fix: grad_w_weight -= hh * v5;
+    grad_w_weight -= hh * lz * v5;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v5;
+    grad_z_weight += hh * hw * v5;
     atomicAdd(grad_value + ptr5, w5 * top_grad_value);
   }
   scalar_t v6 = 0;
   if (h_low >= 0 && w_high <= width - 1 && z_high <= depth - 1) {
     const int ptr6 = h_low_ptr_offset + w_high_ptr_offset + z_high_ptr_offset + base_ptr;
     v6 = bottom_data[ptr6];
-    grad_h_weight -= lw * v6;
-    grad_w_weight += hh * v6;
-    grad_z_weight += lz * v6;
+    // Before trilinear-gradient fix: grad_h_weight -= lw * v6;
+    grad_h_weight -= lw * lz * v6;
+    // Before trilinear-gradient fix: grad_w_weight += hh * v6;
+    grad_w_weight += hh * lz * v6;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v6;
+    grad_z_weight += hh * lw * v6;
     atomicAdd(grad_value + ptr6, w6 * top_grad_value);
   }
   scalar_t v7 = 0;
   if (h_high <= height - 1 && w_low >= 0 && z_high <= depth - 1) {
     const int ptr7 = h_high_ptr_offset + w_low_ptr_offset + z_high_ptr_offset + base_ptr;
     v7 = bottom_data[ptr7];
-    grad_h_weight += hw * v7;
-    grad_w_weight -= lh * v7;
-    grad_z_weight += lz * v7;
+    // Before trilinear-gradient fix: grad_h_weight += hw * v7;
+    grad_h_weight += hw * lz * v7;
+    // Before trilinear-gradient fix: grad_w_weight -= lh * v7;
+    grad_w_weight -= lh * lz * v7;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v7;
+    grad_z_weight += lh * hw * v7;
     atomicAdd(grad_value + ptr7, w7 * top_grad_value);
   }
   scalar_t v8 = 0;
   if (h_high <= height - 1 && w_high <= width - 1 && z_high <= depth - 1) {
     const int ptr8 = h_high_ptr_offset + w_high_ptr_offset + z_high_ptr_offset + base_ptr;
     v8 = bottom_data[ptr8];
-    grad_h_weight += lw * v8;
-    grad_w_weight += lh * v8;
-    grad_z_weight += lz * v8;
+    // Before trilinear-gradient fix: grad_h_weight += lw * v8;
+    grad_h_weight += lw * lz * v8;
+    // Before trilinear-gradient fix: grad_w_weight += lh * v8;
+    grad_w_weight += lh * lz * v8;
+    // Before trilinear-gradient fix: grad_z_weight += lz * v8;
+    grad_z_weight += lh * lw * v8;
     atomicAdd(grad_value + ptr8, w8 * top_grad_value);
   }
 
